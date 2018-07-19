@@ -1,0 +1,9 @@
+{
+    "argv": [
+		"jupyterd",
+    	"{connection_file}"
+    	],
+    "display_name": "D",
+    "language": "d",
+    "name": "d"
+}

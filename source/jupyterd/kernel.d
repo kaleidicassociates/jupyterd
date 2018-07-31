@@ -12,6 +12,8 @@ import std.stdio : writeln;
 
 //TODOs: add kernel UUID to ZMQ identity for ioPub
 
+//debug = traffic;
+//debug = connect;
 void startHeartBeat(shared(Socket*) shbs, shared(bool*) run)
 {
     import core.thread;
@@ -43,7 +45,7 @@ struct Channel
     void bind(const ref ConnectionInfo ci)
     {
         string s = ci.connectionString(port);
-        writeln("Binding to: ",s);
+        debug(connect) writeln("Binding to: ",s);
         socket.bind(s);
     }
     Message getMessage()
@@ -55,19 +57,22 @@ struct Channel
             socket.receive(f);
             frames ~= cast(string)f.data.idup;
         } while (socket.more);
-        writeln("Recieved on ",name);
-        foreach(f;frames)
-            writeln("\t\"",f,"\"");
+        debug(traffic)
+        {
+            writeln("Recieved on ",name);
+            foreach(f;frames)
+                writeln("\t\"",f,"\"");
+        }
         return frames.wireMessage.message();
     }
     void send(string ss, bool more)
     {
-        writeln("\t\"", ss,"\"");
+        debug(traffic) writeln("\t\"", ss,"\"");
         socket.send(ss,more);
     }
     void send(ref WireMessage wm)
     {
-        writeln("Sending on ",name);
+        debug(traffic) writeln("Sending on ",name);
         if (wm.identities)
             foreach(i;wm.identities)
                 send(i,/*more=*/true);
@@ -83,14 +88,16 @@ struct Channel
         send(blankIfNull(wm.metadata) , true);
         send(wm.content,false);
         
-        /+send(s,wm.content, wm.rawBuffers !is null);
+        /+
+        send(s,wm.content, wm.rawBuffers !is null);
         if (wm.rawBuffers !is null)
         {
             foreach(b;wm.rawBuffers)
-            send(b,/+more=+/true);
+            send(b, true);
         }
-        send("",false);+/
-        writeln("sent.");
+        send("",false);
+        +/
+        debug(traffic) writeln("sent.");
     }
 }
 
@@ -134,13 +141,13 @@ struct Kernel
         ioPub   = Channel("ioPub"  ,SocketType.pub,    ci.ioPubPort);
         hb      = Channel("hb"     ,SocketType.rep,    ci.hbPort);
         
-        writeln("Commencing binding...");
+        debug(connect) writeln("Commencing binding...");
         shell.bind(ci);
         control.bind(ci);
         stdin.bind(ci);
         ioPub.bind(ci);
         hb.bind(ci);
-        writeln("... done.");
+        debug(connect) writeln("... done.");
         running = true;
         heartBeat = spawn(&startHeartBeat, cast(shared(Socket*))(&hb.socket), cast(shared(bool*))&running);
     }

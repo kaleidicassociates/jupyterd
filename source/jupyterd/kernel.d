@@ -247,7 +247,7 @@ struct Kernel
         if (!silent)
         {
             publishStatus(Status.busy);
-            executeInputMsg(code);
+            publishInputMsg(code);
         }
         const bool hasCode = code.length == 0;
         string res;
@@ -313,7 +313,7 @@ struct Kernel
         ioPub.lastHeader = msg.header;
     }
     
-    void executeInputMsg(string code)
+    void publishInputMsg(string code)
     {
         auto msg = Message();
         msg.parentHeader = ioPub.lastHeader;

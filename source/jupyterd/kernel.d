@@ -180,8 +180,9 @@ struct Kernel
             session = m.header.session;
             infoSet = true;
         }
-        auto msg = Message(m.header,m.identities,userName,session,protocolVersion);
         publishStatus(Status.busy);
+        auto msg = Message(m.header,m.identities,userName,session,protocolVersion);
+
         switch(m.header.msgType)
         {
             case "execute_request":

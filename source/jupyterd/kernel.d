@@ -338,3 +338,10 @@ struct Kernel
         ioPub.lastHeader = msg.header;
     }
 }
+
+//MASSIVE HACK: allow compiling on OSX for testing echo engine
+version(OSX)
+extern(C) void* rt_loadLibrary(const char* name)
+{
+    return null;
+}

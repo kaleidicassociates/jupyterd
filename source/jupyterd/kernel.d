@@ -9,6 +9,7 @@ import std.concurrency;
 import asdf;
 import zmqd : Socket, SocketType, Frame;
 import std.stdio : writeln;
+import drepl.interpreter : InterpreterResult;
 
 //TODOs: add kernel UUID to ZMQ identity for ioPub
 
@@ -185,7 +186,11 @@ struct Kernel
         {
             case "execute_request":
             {
-                executeRequest(msg,m.content);
+                if(executeRequest(msg,m.content))
+                {
+                    publishStatus(Status.idle);
+                    return;
+                }
                 break;
             }
             case "inspect_request":
@@ -238,23 +243,52 @@ struct Kernel
         
     }
     
-    void executeRequest(ref Message msg, ref JSONValue content)
+    bool executeRequest(ref Message msg, ref JSONValue content)
     {
         msg.header.msgType = "execute_reply";
-        const silent = content["silent"] == JSONValue(true);
-        content["store_history"] = (content["store_history"] == JSONValue(true)) && silent;
+        const bool silent = content["silent"] == JSONValue(true);
+
+        const history = (content["store_history"] == JSONValue(true)) && silent;
         string code = content["code"].str;
         if (!silent)
         {
             publishInputMsg(code);
         }
-        const bool hasCode = code.length == 0;
-        string res;
-        auto status = hasCode ? interp.interpret(content["code"].str,res) : Status.ok;
-        if (!silent) publishStatus(Status.idle);
-        import std.conv : to;
-        msg.content["status"] = status.to!string;
-        msg.content["execution_count"] = execCount++;
+
+        auto res = interp.interpret(code);
+        
+        const succeded = res.state == InterpreterResult.State.success;
+
+        if (!succeded)
+        {
+            if (res.state == InterpreterResult.State.incomplete)
+            {
+                msg.content["ename"]     = "Incomplete request";
+                msg.content["evalue"]    = "Incomplete request";
+                msg.content["traceback"] = [""];
+            }
+            else // error
+            {
+                msg.content["ename"]   = "Error";
+                //TODO: create traceback
+                msg.content["evalue"]  = res.stdout;
+                msg.content["traceback"] = [""];
+                
+            }
+            msg.content["status"] = "error";
+            if (res.stderr.length)
+                publishStreamText("stderr",res.stderr);
+        }
+        else
+        {
+            msg.content["status"] = "ok";
+            if (res.stdout.length)
+                publishStreamText("stdout",res.stdout);
+        }
+
+        msg.content["execution_count"] = execCount;
+        if (history && succeded) execCount++;
+        return silent;
     }
     
 

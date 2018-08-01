@@ -1,5 +1,6 @@
 module juypterd.interpreter;
 import juypterd.kernel;
+import drepl.interpreter : InterpreterResult, interpreter;
 struct LanguageInfo
 {
     string name;
@@ -10,7 +11,7 @@ struct LanguageInfo
 
 interface Interpreter
 {
-    Kernel.Status interpret(string code, out string result);
+    InterpreterResult interpret(const(char)[] code);
     
     string lastErrorName();
     
@@ -25,10 +26,18 @@ final class EchoInterpreter : Interpreter
 {
     LanguageInfo li = LanguageInfo("echo","1.0.0",".txt", "text/plain");
     
-    override Kernel.Status interpret(string code, out string result)
+    private import drepl.engines;
+    
+    typeof(interpreter(echoEngine())) intp;
+    InterpreterResult last;
+    
+    this()
     {
-        result = code;
-        return Kernel.Status.ok;
+        intp = interpreter(echoEngine());
+    }
+    override InterpreterResult interpret(const(char)[] code)
+    {
+        return intp.interpret(code);
     }
     
     override string lastErrorName()

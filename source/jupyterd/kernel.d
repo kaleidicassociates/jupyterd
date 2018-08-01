@@ -280,7 +280,17 @@ struct Kernel
                                         "file_extension" :li.fileExtension];
 
     }
-    
+    void publishStreamText(string stream, string text)
+    {
+        auto msg = Message(ioPub.lastHeader,null,userName,session,protocolVersion);
+        msg.header.msgType = "stream";
+        msg.content["name"] = stream;
+        msg.content["text"] = text;
+        auto wm = msg.wireMessage(key);
+        ioPub.send(wm);
+        ioPub.lastHeader = msg.header;
+    }
+
     void connectRequest(ref Message msg)
     {
         msg.header.msgType = "connect_reply";

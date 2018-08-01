@@ -246,7 +246,6 @@ struct Kernel
         string code = content["code"].str;
         if (!silent)
         {
-            publishStatus(Status.busy);
             publishInputMsg(code);
         }
         const bool hasCode = code.length == 0;

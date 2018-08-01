@@ -13,11 +13,6 @@ interface Interpreter
 {
     InterpreterResult interpret(const(char)[] code);
     
-    string lastErrorName();
-    
-    string lastErrorValue();
-
-    string[] backtrace();
     ref const(LanguageInfo) languageInfo();
 
 }
@@ -40,20 +35,6 @@ final class EchoInterpreter : Interpreter
         return intp.interpret(code);
     }
     
-    override string lastErrorName()
-    {
-        return "";
-    }
-    
-    override string lastErrorValue()
-    {
-        return "";
-    }
-    
-    override string[] backtrace()
-    {
-        return [""];
-    }
     override ref const(LanguageInfo) languageInfo()
     {
         return li;

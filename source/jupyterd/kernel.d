@@ -295,33 +295,9 @@ struct Kernel
     {
         auto msg = Message(ioPub.lastHeader,null,userName,session,protocolVersion);
         msg.header.msgType = "status";
-        
-        final switch(status) with(Status)
-        {
-            case ok:
-            {
-                msg.content["status"] = "ok";
-                break;
-            }
-            case error:
-            {
-                msg.content["status"] = "error";
-                msg.content["ename"]  = interp.lastErrorName();
-                msg.content["evalue"] = interp.lastErrorValue();
-                msg.content["traceback"] = interp.backtrace();
-                break;
-            }
-            case idle:
-            {
-                msg.content["status"] = "idle";
-                break;
-            }
-            case busy:
-            {
-                msg.content["status"] = "busy";
-                break;
-            }
-        }
+        import std.conv : to;
+        msg.content["status"] = status.to!string;
+
         auto wm = msg.wireMessage(key);
         ioPub.send(wm);
         ioPub.lastHeader = msg.header;

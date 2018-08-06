@@ -121,14 +121,17 @@ struct WireMessage
         auto mac = hmac!SHA256(key.representation);
 
         header = m.header.serializeToJson;
+            
         if (m.parentHeader.msgID is null)
             parentHeader = "{}";
         else
             parentHeader = m.parentHeader.serializeToJson;
+            
         if(m.metadata == JSONValue(null))
             metadata = "{}";
         else
             metadata = m.metadata.toString;
+            
         content = m.content.toString;
         import std.meta : AliasSeq;
         foreach(w;AliasSeq!(header,parentHeader,metadata,content))

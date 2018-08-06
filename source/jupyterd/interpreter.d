@@ -32,7 +32,8 @@ final class EchoInterpreter : Interpreter
     }
     override InterpreterResult interpret(const(char)[] code)
     {
-        return intp.interpret(code);
+        return InterpreterResult(InterpreterResult.State.success,cast(string)code,"");
+        //return intp.interpret(code);
     }
     
     override ref const(LanguageInfo) languageInfo()

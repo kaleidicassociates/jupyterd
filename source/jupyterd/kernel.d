@@ -134,7 +134,7 @@ struct Kernel
         import std.file : readText;
         auto ci = connectionFile.readText.deserialize!ConnectionInfo;
 
-        key = ci.key;
+        key = ci.key.dup;
         enum shellType = SocketType.router;
         shell   = Channel("shell"  ,shellType, ci.shellPort);
         control = Channel("control",shellType, ci.controlPort);

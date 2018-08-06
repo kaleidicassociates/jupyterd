@@ -6,7 +6,7 @@ import std.stdio;
 int main(string[] args)
 {
     Interpreter i;
-    writeln(zmqVersion());
+
     switch(args[1])
     {
         case "echo":

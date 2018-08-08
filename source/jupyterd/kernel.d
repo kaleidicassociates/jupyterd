@@ -343,7 +343,7 @@ struct Kernel
         auto msg = Message(ioPub.lastHeader,null,userName,session,protocolVersion);
         msg.header.msgType = "status";
         import std.conv : to;
-        msg.content["status"] = status.to!string;
+        msg.content["execution_state"] = status.to!string;
 
         auto wm = msg.wireMessage(key);
         ioPub.send(wm);

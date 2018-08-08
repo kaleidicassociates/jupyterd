@@ -151,8 +151,9 @@ struct WireMessage
         
         foreach(u;us[])
         {
+            if (u <= 0xf)
+                cs.put('0');
             cs.put(toChars!16(cast(uint)u));
-
         }
         return cs.data.idup;
     }

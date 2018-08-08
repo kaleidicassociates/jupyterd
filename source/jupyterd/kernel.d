@@ -49,7 +49,7 @@ struct Channel
         debug(connect) writeln("Binding to: ",s);
         socket.bind(s);
     }
-    Message getMessage()
+    Message getMessage(string key)
     {
         string[] frames;
         frames.length = 6;
@@ -64,7 +64,10 @@ struct Channel
             foreach(f;frames)
                 writeln("\t\"",f,"\"");
         }
-        return frames.wireMessage.message();
+        auto wm = frames.wireMessage;
+        auto sig = wm.signature(key);
+        writeln("\tSignature match? ", sig ,"\n\t                 ", wm.sig);
+        return wm.message();
     }
     void send(string ss, bool more)
     {
@@ -173,7 +176,7 @@ struct Kernel
     
     void handleShellMessage(ref Channel c)
     {
-        auto m = c.getMessage();
+        auto m = c.getMessage(key);
         if (!infoSet)
         {
             userName = m.header.userName;

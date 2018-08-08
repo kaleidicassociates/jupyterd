@@ -118,7 +118,7 @@ struct WireMessage
     {
         import std.digest : hexDigest;
         identities = m.identities;
-        auto mac = hmac!SHA256(key.representation);
+        
 
         header = m.header.serializeToJson;
             
@@ -133,7 +133,14 @@ struct WireMessage
             metadata = m.metadata.toString;
             
         content = m.content.toString;
+        sig = signature(key);
+        
+    }
+
+    string signature(string key)
+    {
         import std.meta : AliasSeq;
+        auto mac = hmac!SHA256(key.representation);
         foreach(w;AliasSeq!(header,parentHeader,metadata,content))
             mac.put(w.representation);
         ubyte[32] us = mac.finish;
@@ -147,16 +154,7 @@ struct WireMessage
             cs.put(toChars!16(cast(uint)u));
 
         }
-        sig = cs.data.idup;
-    }
-
-    bool signatureMatches(string key)
-    {
-        auto mac = hmac!SHA256(key.representation);
-        import std.meta : AliasSeq;
-        foreach(w;AliasSeq!(header,parentHeader,metadata,content))
-            mac.put(w.representation);
-        return mac.finish == sig;
+        return cs.data.idup;
     }
 }
 

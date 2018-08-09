@@ -41,3 +41,28 @@ final class EchoInterpreter : Interpreter
         return li;
     }
 }
+
+final class DInterpreter : Interpreter
+{
+    LanguageInfo li = LanguageInfo("D","2.081.1",".d", "text/plain");
+    
+    private import drepl.engines;
+    
+    typeof(interpreter(dmdEngine())) intp;
+    InterpreterResult last;
+    
+    this()
+    {
+        intp = interpreter(dmdEngine());
+    }
+    override InterpreterResult interpret(const(char)[] code)
+    {
+        return InterpreterResult(InterpreterResult.State.success,cast(string)code,"");
+    }
+    
+    override ref const(LanguageInfo) languageInfo()
+    {
+        return li;
+    }
+}
+

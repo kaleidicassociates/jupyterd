@@ -1,9 +1,9 @@
 {
     "argv": [
-		"jupyterd",
-    	"{connection_file}"
-    	],
-    "display_name": "D",
-    "language": "d",
-    "name": "d"
+        "jupyterd",
+        "d",
+        "{connection_file}"
+     ],
+    "display_name": "d",
+    "language": "d"
 }

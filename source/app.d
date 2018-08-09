@@ -12,6 +12,9 @@ int main(string[] args)
         case "echo":
             i = new EchoInterpreter();
             break;
+        case "d":
+            i = new DInterpreter();
+            break;
         default:
             return 1;
     }

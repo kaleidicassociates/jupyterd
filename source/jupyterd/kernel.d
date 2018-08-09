@@ -298,8 +298,8 @@ struct Kernel
         else
         {
             msg.content["status"] = "ok";
-            if (res.stdout.length)
-                publishStreamText("stdout",res.stdout);
+            //if (res.stdout.length)
+            //    publishStreamText("stdout",res.stdout);
         }
 
         msg.content["execution_count"] = execCount;

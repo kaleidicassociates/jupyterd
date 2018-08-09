@@ -329,17 +329,7 @@ struct Kernel
                                         "file_extension" :li.fileExtension];
 
     }
-    void publishStreamText(string stream, string text)
-    {
-        auto msg = Message(ioPub.lastHeader,null,userName,session,protocolVersion);
-        msg.header.msgType = "stream";
-        msg.content["name"] = stream;
-        msg.content["text"] = text;
-        auto wm = msg.wireMessage(key);
-        ioPub.send(wm);
-        ioPub.lastHeader = msg.header;
-    }
-
+    
     void connectRequest(ref Message msg)
     {
         msg.header.msgType = "connect_reply";
@@ -349,28 +339,55 @@ struct Kernel
         msg.content["hb_port"]      = hb.port;
         msg.content["control_port"] = control.port;
     }
-
-    void publishStatus(Status status)
+    
+    Message newIOPubMsg(string hdrName)
     {
-        auto msg = Message(ioPub.lastHeader,null,userName,session,protocolVersion);
-        msg.header.msgType = "status";
-        import std.conv : to;
-        msg.content["execution_state"] = status.to!string;
-
+        auto m = Message(ioPub.lastHeader,["kernel."~session~"." ~ hdrName],userName,session,protocolVersion);
+        m.header.msgType = hdrName;
+        return m;
+    }
+    
+    void sendIOPubMsg(ref Message msg)
+    {
         auto wm = msg.wireMessage(key);
         ioPub.send(wm);
         ioPub.lastHeader = msg.header;
     }
     
+    void publishExecResults(string stdout)
+    {
+        auto msg = newIOPubMsg("execute_result");
+        msg.content["execution_count"] = execCount;
+        msg.content["data"] = ["text/plain" : stdout];
+        string[string] dummy;
+        msg.content["metadata"] = dummy;
+        sendIOPubMsg(msg);
+        
+    }
+    
+    void publishStreamText(string stream, string text)
+    {
+        auto msg = newIOPubMsg("stream");
+        msg.content["name"] = stream;
+        msg.content["text"] = text;
+        sendIOPubMsg(msg);
+    }
+
+    void publishStatus(Status status)
+    {
+        auto msg = newIOPubMsg("status");
+        import std.conv : to;
+        msg.content["execution_state"] = status.to!string;
+
+        sendIOPubMsg(msg);
+    }
+    
     void publishInputMsg(string code)
     {
-        auto msg = Message();
-        msg.parentHeader = ioPub.lastHeader;
+        auto msg = newIOPubMsg("execute_input");
         msg.content["code"] = code;
         msg.content["execution_count"] = execCount;
-        auto wm = msg.wireMessage(key);
-        ioPub.send(wm);
-        ioPub.lastHeader = msg.header;
+        sendIOPubMsg(msg);
     }
 }
 

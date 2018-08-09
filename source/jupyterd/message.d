@@ -8,7 +8,7 @@ import std.digest.hmac;
 import std.digest.sha;
 
 import std.stdio : writeln; //Debugging
-
+import juypterd.kernel : Kernel;
 /// MessageHeader encodes header info for ZMQ messages.
 struct MessageHeader
 {
@@ -25,7 +25,7 @@ struct MessageHeader
     string msgType;
     
     @serializationKeys("version")
-    string protocolVersion;
+    string protocolVersion = Kernel.protocolVersion;
     
     @serializationKeys("date")
     string timestamp;

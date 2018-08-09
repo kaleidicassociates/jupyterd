@@ -344,6 +344,7 @@ struct Kernel
     
     Message newIOPubMsg(string hdrName)
     {
+        auto m = Message(lastHeader,["kernel."~session~"." ~ hdrName],userName,session,protocolVersion);
         m.header.msgType = hdrName;
         return m;
     }

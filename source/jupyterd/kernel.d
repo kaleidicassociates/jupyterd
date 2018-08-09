@@ -303,6 +303,7 @@ struct Kernel
         }
 
         msg.content["execution_count"] = execCount;
+        publishExecResults(res.stdout);
         if (history && succeded) execCount++;
         return silent;
     }

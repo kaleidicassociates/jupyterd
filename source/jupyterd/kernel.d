@@ -119,7 +119,7 @@ struct Kernel
     }
 
     Channel shell, control, stdin, ioPub, hb;
-
+    MessageHeader lastHeader;
     string userName, session, key;
     bool infoSet;
     // For keping track of In[n] and Out[n]
@@ -195,6 +195,7 @@ struct Kernel
             session = m.header.session;
             infoSet = true;
         }
+        lastHeader = m.header;
         publishStatus(Status.busy);
         auto msg = Message(m.header,m.identities,userName,session,protocolVersion);
 
@@ -343,7 +344,6 @@ struct Kernel
     
     Message newIOPubMsg(string hdrName)
     {
-        auto m = Message(ioPub.lastHeader,["kernel."~session~"." ~ hdrName],userName,session,protocolVersion);
         m.header.msgType = hdrName;
         return m;
     }
@@ -352,7 +352,6 @@ struct Kernel
     {
         auto wm = msg.wireMessage(key);
         ioPub.send(wm);
-        ioPub.lastHeader = msg.header;
     }
     
     void publishExecResults(string stdout)
@@ -363,7 +362,6 @@ struct Kernel
         string[string] dummy;
         msg.content["metadata"] = dummy;
         sendIOPubMsg(msg);
-        
     }
     
     void publishStreamText(string stream, string text)

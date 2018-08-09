@@ -123,7 +123,7 @@ struct Kernel
     string userName, session, key;
     bool infoSet;
     // For keping track of In[n] and Out[n]
-    int execCount = 0;
+    int execCount = 1;
     Tid heartBeat;
 
     Interpreter interp;

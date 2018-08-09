@@ -7,7 +7,8 @@ import std.json;
 import std.uuid;
 import std.concurrency;
 import asdf;
-import zmqd : Socket, SocketType, Frame;
+import zmqd : Socket, SocketType, Frame, poll, PollItem, PollFlags;
+import core.time;
 import std.stdio : writeln;
 import drepl.interpreter : InterpreterResult;
 
@@ -160,10 +161,21 @@ struct Kernel
     {
         while(running)
         {
-            handleShellMessage(shell);
-        
-            // control is identical to shell but usually recieves shutdown & abort signals
-            handleShellMessage(control);
+            PollItem[] items = [
+                PollItem(shell.socket, PollFlags.pollIn),
+                PollItem(control.socket, PollFlags.pollIn),
+            ];
+
+            const n = poll(items, 100.msecs);
+            if (n)
+            {
+                if (items[0].returnedEvents == PollFlags.pollIn)
+                    handleShellMessage(shell);
+                
+                // control is identical to shell but usually recieves shutdown & abort signals
+                if (items[1].returnedEvents == PollFlags.pollIn)
+                    handleShellMessage(control);
+            }
             
             //stdin (the channel) is used for requesting raw input from client.
             //not implemented yet

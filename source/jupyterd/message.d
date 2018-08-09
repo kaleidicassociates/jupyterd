@@ -130,9 +130,9 @@ struct WireMessage
         if(m.metadata == JSONValue(null))
             metadata = "{}";
         else
-            metadata = m.metadata.toString;
+            metadata = m.metadata.toString(JSONOptions.doNotEscapeSlashes);
             
-        content = m.content.toString;
+        content = m.content.toString(JSONOptions.doNotEscapeSlashes);
         sig = signature(key);
         
     }

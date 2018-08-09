@@ -36,7 +36,6 @@ struct Channel
 {
     Socket socket;
     ushort port;
-    MessageHeader lastHeader;
     string name;
     this(string n,SocketType t, ushort p)
     {

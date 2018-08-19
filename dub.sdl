@@ -9,3 +9,5 @@ dependency "drepl" version="~>0.2.1"
 targetType "executable"
 lflags "-ldl"
 //dflags-ldc2 "-link-defaultlib-shared"
+sourcePath "source"
+

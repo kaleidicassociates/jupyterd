@@ -43,7 +43,7 @@ string getKernelPath() {
 	throw new Exception("python2 kernel path not found");
 }
 
-void installJupyterd(const string kernelPath) {
+void installJupyterd(const string kernelPath, const bool build) {
 	import std.file : exists, mkdir, copy, isDir, isFile;
 
 	const ddir = kernelPath ~ 'd';
@@ -56,8 +56,8 @@ void installJupyterd(const string kernelPath) {
 	auto g = execute(["cp", k, ddir]);
 
 	enum j = "jupyterd";
-	if(!isFile(j)) {
-		auto e = execute(["dub"]);
+	if(!exists(j) || build) {
+		auto e = execute(["dub", "build"]);
 		writeln(e.output);
 	}
 
@@ -83,10 +83,12 @@ int main(string[] args) {
 	bool install;
 	bool remove;
 	bool path;
+	bool build;
 
 	auto helpInformation = getopt(args,
 			"install|i", "install or update the D Jupyter Kernel", &install,
 			"remove|r", "remove the D Jupyter Kernel", &remove,
+			"build|b", "force jupyterd build", &remove,
 			"path|p", "display the path where Jupyter Kernel are installed",
 				&path
 		);
@@ -103,7 +105,7 @@ int main(string[] args) {
 	}
 
 	if(install) {
-		installJupyterd(ppath);
+		installJupyterd(ppath, build);
 		return 0;
 	} else if(remove) {
 		removeJupyterd(ppath);

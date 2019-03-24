@@ -25,7 +25,13 @@ environment.
 
 Other projects - see pydmagic by John Colvin
 
+Try it out
+==========
 
+Could try it out by running:
+```sh
+docker run -p 8888:8888 -ti dlanguage/notebook
+```
 
 To Do
 =====
@@ -36,6 +42,3 @@ To Do
 * Consider adding to Dlang tour and run.dlang.io when stable
 * Integrate with dpp
 * Integrate with dub
-
-
-

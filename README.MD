@@ -1,6 +1,11 @@
 JupyterD
 ========
 
+** This project has been replaced by Jupyter-Wire **
+https://github.com/kaleidicassociates/jupyter-wire
+
+
+
 A Jupyter Notebook kernel written in D.
 
 Currently supports an echo "interpreter" and D Repl.

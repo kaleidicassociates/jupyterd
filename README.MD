@@ -38,4 +38,6 @@ To Do
 * Integrate with dub
 
 
-
+Notes
+=====
+* Existing kernel will allow you to return MIME images, HTML and Markdown inline
